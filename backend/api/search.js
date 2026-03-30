@@ -1,12 +1,11 @@
 const cheerio = require('cheerio');
+const fetch = (...args) => import('node-fetch').then(m => m.default(...args));
 
 async function getEmbassies(country) {
   const params = new URLSearchParams({
     action: 'parse',
     page: `List of diplomatic missions in ${country}`,
-    prop: 'text',
-    format: 'json',
-    origin: '*',
+    prop: 'text', format: 'json', origin: '*',
   });
   const res = await fetch(`https://en.wikipedia.org/w/api.php?${params}`);
   const data = await res.json();
@@ -36,9 +35,7 @@ async function getWebsite(wikiLink) {
       if (h && h.startsWith('http') && !site) site = h;
     });
     return site;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 async function getFBPage(siteUrl) {
@@ -52,50 +49,31 @@ async function getFBPage(siteUrl) {
     $('a[href*="facebook.com"]').each((_, el) => {
       const h = $(el).attr('href') || '';
       const m = h.match(/facebook\.com\/([^/?#\s]+)/);
-      if (m && m[1] && !['sharer', 'share', 'dialog', 'plugins', 'login'].includes(m[1]) && !fb)
-        fb = m[1];
+      if (m && m[1] && !['sharer','share','dialog','plugins','login'].includes(m[1]) && !fb) fb = m[1];
     });
     return fb;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   const { country, job } = req.query;
-  if (!country || !job) {
-    return res.status(400).json({ error: 'country and job required' });
-  }
-
+  if (!country || !job) return res.status(400).json({ error: 'country and job required' });
   try {
     const embassies = await getEmbassies(country);
     const results = [];
-
-    await Promise.allSettled(
-      embassies.map(async (emb) => {
-        const website = await getWebsite(emb.wikiLink);
-        const fbPage = website ? await getFBPage(website) : null;
-        if (website || fbPage) {
-          results.push({
-            name: emb.name,
-            country,
-            website: website || null,
-            facebookSearch: fbPage
-              ? `https://www.facebook.com/${fbPage}/search/?q=${encodeURIComponent(job)}`
-              : null,
-          });
-        }
-      })
-    );
-
+    await Promise.allSettled(embassies.map(async (emb) => {
+      const website = await getWebsite(emb.wikiLink);
+      const fbPage = website ? await getFBPage(website) : null;
+      if (website || fbPage) results.push({
+        name: emb.name, country,
+        website: website || null,
+        facebookSearch: fbPage ? `https://www.facebook.com/${fbPage}/search/?q=${encodeURIComponent(job)}` : null,
+      });
+    }));
     return res.status(200).json(results);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
+  } catch (err) { return res.status(500).json({ error: err.message }); }
 };
