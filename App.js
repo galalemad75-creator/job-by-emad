@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { COLORS, SHADOWS } from './src/constants/colors';
@@ -11,6 +12,27 @@ import HomeScreen from './src/screens/HomeScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
 import PackagesScreen from './src/screens/PackagesScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import TermsOfServiceScreen from './src/screens/TermsOfServiceScreen';
+import RefundPolicyScreen from './src/screens/RefundPolicyScreen';
+import ContactUsScreen from './src/screens/ContactUsScreen';
+import AboutUsScreen from './src/screens/AboutUsScreen';
+
+const Tab = createBottomTabNavigator();
+const SettingsStack = createStackNavigator();
+
+function SettingsStackScreen() {
+  return (
+    <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
+      <SettingsStack.Screen name="SettingsMain" component={SettingsScreen} />
+      <SettingsStack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      <SettingsStack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+      <SettingsStack.Screen name="RefundPolicy" component={RefundPolicyScreen} />
+      <SettingsStack.Screen name="ContactUs" component={ContactUsScreen} />
+      <SettingsStack.Screen name="AboutUs" component={AboutUsScreen} />
+    </SettingsStack.Navigator>
+  );
+}
 
 const Tab = createBottomTabNavigator();
 
@@ -46,7 +68,7 @@ function AppTabs() {
         <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('search') }} />
         <Tab.Screen name="Results" component={ResultsScreen} options={{ tabBarLabel: t('results') }} />
         <Tab.Screen name="Packages" component={PackagesScreen} options={{ tabBarLabel: t('packages') }} />
-        <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: t('settings') }} />
+        <Tab.Screen name="Settings" component={SettingsStackScreen} options={{ tabBarLabel: t('settings') }} />
       </Tab.Navigator>
     </NavigationContainer>
   );

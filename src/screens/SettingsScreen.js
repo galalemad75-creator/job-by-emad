@@ -6,7 +6,7 @@ import { COLORS, SHADOWS, RADIUS } from '../constants/colors';
 import Header from '../components/Header';
 import Card from '../components/Card';
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const { t, lang, changeLang, plan, alertEnabled, toggleAlert, savedJob, saveJobForAlert } = useApp();
 
   const Row = ({ icon, label, onPress, right, iconColor = COLORS.primary }) => (
@@ -109,22 +109,40 @@ export default function SettingsScreen() {
             icon="shield-checkmark-outline"
             label={t('privacyPolicy')}
             iconColor={COLORS.success}
-            onPress={() => Linking.openURL('https://jobbyemad.com/privacy')}
+            onPress={() => navigation.navigate('PrivacyPolicy')}
           />
           <Row
             icon="document-text-outline"
             label={t('terms')}
             iconColor={COLORS.secondary}
-            onPress={() => Linking.openURL('https://jobbyemad.com/terms')}
+            onPress={() => navigation.navigate('TermsOfService')}
+          />
+          <Row
+            icon="cash-outline"
+            label={lang === 'ar' ? 'سياسة الاسترجاع' : 'Refund Policy'}
+            iconColor="#f59e0b"
+            onPress={() => navigation.navigate('RefundPolicy')}
+          />
+          <Row
+            icon="chatbubble-outline"
+            label={lang === 'ar' ? 'اتصل بنا' : 'Contact Us'}
+            iconColor="#8b5cf6"
+            onPress={() => navigation.navigate('ContactUs')}
+          />
+          <Row
+            icon="information-circle-outline"
+            label={lang === 'ar' ? 'من نحن' : 'About Us'}
+            iconColor={COLORS.primary}
+            onPress={() => navigation.navigate('AboutUs')}
           />
           <Row
             icon="help-circle-outline"
             label={t('support')}
             iconColor={COLORS.warning}
-            onPress={() => Linking.openURL('mailto:support@jobbyemad.com')}
+            onPress={() => Linking.openURL('mailto:emadh5156@gmail.com')}
           />
           <Row
-            icon="information-circle-outline"
+            icon="code-outline"
             label={`${t('version')}`}
             iconColor={COLORS.gray500}
             onPress={() => {}}
